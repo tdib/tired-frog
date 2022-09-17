@@ -3,19 +3,21 @@
   import frontEvil from '$lib/assets/front-evil.png'
   import back from '$lib/assets/back.png'
   import Fly from '$lib/components/Fly.svelte'
+  import Tongue from '$lib/components/Tongue.svelte'
   import { onMount } from 'svelte'
 
   let currImg = front
 
-  const eatGlob = import.meta.glob('$lib/assets/eat/*.mp3')
-  const eatPaths = Object.keys(eatGlob)
+  const eatGlob = import.meta.glob('$lib/assets/eat/*.mp3', { eager: true })
+  const eatPaths = Object.values(eatGlob).map((path) => path.default)
 
   let numFlies = 12
   let numMurdered = 0
+  let targetPos
 
   onMount(() => {
     document.addEventListener('click', (e) => {
-      console.log(e.clientX, e.clientY)
+      targetPos = [e.clientX, e.clientY]
     })
   })
 
@@ -31,7 +33,7 @@
     if (numMurdered >= 100 && currImg === front) currImg = frontEvil
     // Play a random eat sound
     const randomEat = eatPaths[Math.floor(Math.random() * eatPaths.length)]
-    const randomEatAudio = new Audio(new URL(randomEat, import.meta.url))
+    const randomEatAudio = new Audio(randomEat)
     randomEatAudio.play()
   }
 </script>
@@ -44,15 +46,20 @@
     <Fly killFlyFn={murderAnotherFamily}/>
   {/each}
 
-  <img
-    class='phrog'
-    src={currImg}
-    alt='A good looking frog that has not slept in 3 days'
-    on:click={handlePhrogClick}
-  />
+  <div class='phrog-container'>
+    <Tongue targetPos={targetPos} />
+    <img
+      class='phrog'
+      src={currImg}
+      style='z-index: {currImg === back ? 2 : 0}'
+      draggable='false'
+      alt='A good looking frog that has not slept in 3 days'
+      on:click|stopPropagation={handlePhrogClick}
+    />
+  </div>
 </div>
 
-<style lang='scss'>
+<style>
   .sky {
     background-color: hsl(201deg, 90%, 84%);
     position: absolute;
@@ -62,12 +69,17 @@
     bottom: 0;
   }
 
-  .phrog {
+  .phrog-container {
     position: absolute;
     left: 20%;
     bottom: 0;
     width: 20em;
-    image-rendering: pixelated;
   }
 
+  .phrog {
+    display: block;
+    width: 100%;
+    image-rendering: pixelated;
+    position: relative;
+  }
 </style>
