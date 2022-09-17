@@ -1,33 +1,39 @@
 <script>
   import { onMount } from 'svelte'
 
-  export let targetPos
-  let startPos
-
-  let tongueElement
-  onMount(() => {
-    tongueElement = document.querySelector('.tongue')?.getBoundingClientRect()
-    startPos = [tongueElement.x, tongueElement.y+16]
-    window.addEventListener('resize', () => {
-      tongueElement = document.querySelector('.tongue')?.getBoundingClientRect()
-      startPos = [tongueElement.x, tongueElement.y+16]
-    })
-  })
+  export let targetPos = Array(2)
+  let startPos = Array(2)
 
   let targetAngle = 0
   let targetDist = 0
   $: {
     if (targetPos && startPos) {
+      // Calculate angle and distance of the clicked location for tongue transformation
       targetAngle = Math.atan2(targetPos[1] - startPos[1], targetPos[0] - startPos[0]) * (180 / Math.PI)
       targetDist = Math.sqrt(Math.pow(targetPos[1]-startPos[1], 2) + Math.pow(targetPos[0]-startPos[0], 2))
+      // Retract tongue
       window.setTimeout(() => {
         targetDist = 0
       }, 125)
     }
   }
+
+  let tongueElement
+  onMount(() => {
+    const tongueRect = tongueElement.getBoundingClientRect()
+    startPos = [tongueRect.x, tongueRect.y+16]
+    window.addEventListener('resize', () => {
+      startPos = [tongueRect.x, tongueRect.y+16]
+      console.log(startPos, targetPos);
+    })
+  })
 </script>
 
-<div class='tongue' style='--target-angle: {targetAngle}deg; --target-dist: {targetDist}px'></div>
+<div
+  class='tongue'
+  style='--target-angle: {targetAngle}deg; --target-dist: {targetDist}px'
+  bind:this={tongueElement}
+/>
 
 <style>
   .tongue {

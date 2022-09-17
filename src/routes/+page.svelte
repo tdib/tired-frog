@@ -13,8 +13,9 @@
 
   let numFlies = 12
   let numMurdered = 0
-  let targetPos
+  let targetPos = Array(2)
 
+  // Detect click position for tongue
   onMount(() => {
     document.addEventListener('click', (e) => {
       targetPos = [e.clientX, e.clientY]
@@ -24,28 +25,39 @@
   function murderAnotherFamily() {
     console.log('You horrible human.');
     numMurdered++
+    // Random chance to spawn a new fly
     if (Math.random() > 0.5) numFlies++
+    // Turn frog evil (assuming it is facing you)
     if (numMurdered >= 100 && currImg === front) currImg = frontEvil
   }
 
   function handlePhrogClick() {
-    currImg = currImg === front ? back : front
+    // Flip frog
+    currImg = currImg === front || currImg === frontEvil ? back : front
     if (numMurdered >= 100 && currImg === front) currImg = frontEvil
+
     // Play a random eat sound
     const randomEat = eatPaths[Math.floor(Math.random() * eatPaths.length)]
     const randomEatAudio = new Audio(randomEat)
     randomEatAudio.play()
   }
+
+  // Special print when phrog go goblin mode
+  $: if (numMurdered === 100) console.log('Phrog go goblin mode')
 </script>
 
 <div class='sky'>
+  <!-- Important information -->
   <h1>Tired Frog - A "game" by Dib</h1>
   <h2>You have murdered {numMurdered} flies and families!</h2>
+  <p>Benji is the proest gamer frfr</p>
 
+  <!-- Spawn flies as necessary -->
   {#each Array(numFlies) as i}
     <Fly killFlyFn={murderAnotherFamily}/>
   {/each}
 
+  <!-- Actual phrog -->
   <div class='phrog-container'>
     <Tongue targetPos={targetPos} />
     <img
@@ -59,7 +71,7 @@
   </div>
 </div>
 
-<style>
+<style lang='scss'>
   .sky {
     background-color: hsl(201deg, 90%, 84%);
     position: absolute;
@@ -67,19 +79,26 @@
     left: 0;
     right: 0;
     bottom: 0;
+
+    p {
+      position: absolute;
+      top: 42%;
+      left: 60%;
+    }
+
+    .phrog-container {
+      position: absolute;
+      left: 20%;
+      bottom: 0;
+      width: 20em;
+
+      .phrog {
+        display: block;
+        width: 100%;
+        image-rendering: pixelated;
+        position: relative;
+      }
+    }
   }
 
-  .phrog-container {
-    position: absolute;
-    left: 20%;
-    bottom: 0;
-    width: 20em;
-  }
-
-  .phrog {
-    display: block;
-    width: 100%;
-    image-rendering: pixelated;
-    position: relative;
-  }
 </style>

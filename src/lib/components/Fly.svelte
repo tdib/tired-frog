@@ -1,15 +1,16 @@
 <script>
   import fly from '$lib/assets/fly.png'
 
+  export let killFlyFn = () => {}
+
+  // Get paths for buzzing and death audio files
   const buzzingGlob = import.meta.glob('$lib/assets/buzzing/*.mp3', { eager: true })
   const buzzingPaths = Object.values(buzzingGlob).map((path) => path.default)
-
   const deathGlob = import.meta.glob('$lib/assets/death/*.mp3', { eager: true })
   const deathPaths = Object.values(deathGlob).map((path) => path.default)
 
-  export let killFlyFn
   // Choose a random size for the fly (up to 5em)
-  const size = `${Math.ceil(Math.random() * 5)}em`
+  const size = Math.ceil(Math.random() * 5)
 
   // Choose random location off the right side of the screen
   let yOffset = Math.floor(Math.random() * 50)
@@ -20,8 +21,8 @@
     xOffset -= 1
     // When fly goes past the left side, teleport back to a random
     // location on the right
-    if (xOffset < 0 - size*2) {
-      xOffset = 100 + Math.floor(Math.random() * size*5)
+    if (xOffset < 0 - size*16) {
+      xOffset = 100 + Math.floor(Math.random() * size*16*5)
       yOffset = Math.floor(Math.random() * 60)
     }
   }, 100)
@@ -39,8 +40,9 @@
     // Play a random buzz sound
     const randomBuzz = buzzingPaths[Math.floor(Math.random() * buzzingPaths.length)]
     const randomBuzzAudio = new Audio(randomBuzz)
-    randomBuzzAudio.volume = 0.4
+    randomBuzzAudio.volume = 0.25
     randomBuzzAudio.play()
+    // Loop sound
     randomBuzzAudio.addEventListener('ended', function () {
       this.currentTime = 0
       this.play()
@@ -52,12 +54,12 @@
 <img
   src={fly}
   draggable='false'
-  style='--size: {size}; --y-offset: {yOffset}%; --x-offset: {xOffset}%'
+  style='--size: {size}em; --y-offset: {yOffset}%; --x-offset: {xOffset}%'
   alt='A good looking fly that will eat your family'
   on:click={murderFlyAndItsFamily}
 />
 
-<style>
+<style lang='scss'>
   img {
     position: absolute;
     width: var(--size);
@@ -65,10 +67,9 @@
     top: var(--y-offset);
     left: var(--x-offset);
     image-rendering: pixelated;
-  }
 
-  :hover {
-    cursor: pointer;
+    &:hover {
+      cursor: pointer;
+    }
   }
-
 </style>
