@@ -1,11 +1,21 @@
 <script>
   import { onMount } from 'svelte'
 
-  export let targetPos = Array(2)
-  let startPos = Array(2)
+  export let targetPos
+  let startPos
 
   let targetAngle = 0
   let targetDist = 0
+  let tongueElement
+  onMount(() => {
+    const tongueRect = tongueElement.getBoundingClientRect()
+    startPos = [tongueRect.x, tongueRect.y+16]
+    window.addEventListener('resize', () => {
+      startPos = [tongueRect.x, tongueRect.y+16]
+    })
+  })
+
+
   $: {
     if (targetPos && startPos) {
       // Calculate angle and distance of the clicked location for tongue transformation
@@ -18,15 +28,6 @@
     }
   }
 
-  let tongueElement
-  onMount(() => {
-    const tongueRect = tongueElement.getBoundingClientRect()
-    startPos = [tongueRect.x, tongueRect.y+16]
-    window.addEventListener('resize', () => {
-      startPos = [tongueRect.x, tongueRect.y+16]
-      console.log(startPos, targetPos);
-    })
-  })
 </script>
 
 <div
