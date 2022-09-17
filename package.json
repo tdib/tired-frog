@@ -12,6 +12,7 @@
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "next",
 		"@sveltejs/kit": "next",
+		"sass": "^1.54.9",
 		"scss": "^0.2.4",
 		"svelte": "^3.44.0",
 		"svelte-check": "^2.7.1",
